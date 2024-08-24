@@ -123,6 +123,8 @@ def _get_guide_and_mode(
         return choices_regex, GuidedDecodingMode.CHOICE
     elif request.guided_grammar:
         return request.guided_grammar, GuidedDecodingMode.GRAMMAR
+    elif request.guided_stencil:
+        raise ValueError("Stencil guided decoding not supported by outlines")
     elif (not isinstance(request, GuidedDecodingRequest)
           and request.response_format is not None
           and request.response_format.type == "json_object"):

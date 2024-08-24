@@ -216,6 +216,11 @@ class ChatCompletionRequest(OpenAIBaseModel):
         description=(
             "If specified, the output will be exactly one of the choices."),
     )
+    guided_stencil: Optional[dict] = Field(
+        default=None,
+        description=(
+            "If specified, the output will follow the stencil template."),
+    )
     guided_grammar: Optional[str] = Field(
         default=None,
         description=(
@@ -321,13 +326,15 @@ class ChatCompletionRequest(OpenAIBaseModel):
         guide_count = sum([
             "guided_json" in data and data["guided_json"] is not None,
             "guided_regex" in data and data["guided_regex"] is not None,
-            "guided_choice" in data and data["guided_choice"] is not None
+            "guided_choice" in data and data["guided_choice"] is not None,
+            "guided_stencil" in data and data["guided_stencil"] is not None
         ])
         # you can only use one kind of guided decoding
         if guide_count > 1:
             raise ValueError(
                 "You can only use one kind of guided decoding "
-                "('guided_json', 'guided_regex' or 'guided_choice').")
+                "('guided_json', 'guided_regex', 'guided_stencil' "
+                "or 'guided_choice').")
         # you can only either use guided decoding or tools, not both
         if guide_count > 1 and "tool_choice" in data and data[
                 "tool_choice"] != "none":
@@ -415,6 +422,11 @@ class CompletionRequest(OpenAIBaseModel):
         description=(
             "If specified, the output will be exactly one of the choices."),
     )
+    guided_stencil: Optional[dict] = Field(
+        default=None,
+        description=(
+            "If specified, the output will follow the stencil template."),
+    )
     guided_grammar: Optional[str] = Field(
         default=None,
         description=(
@@ -490,12 +502,14 @@ class CompletionRequest(OpenAIBaseModel):
         guide_count = sum([
             "guided_json" in data and data["guided_json"] is not None,
             "guided_regex" in data and data["guided_regex"] is not None,
-            "guided_choice" in data and data["guided_choice"] is not None
+            "guided_choice" in data and data["guided_choice"] is not None,
+            "guided_stencil" in data and data["guided_stencil"] is not None
         ])
         if guide_count > 1:
             raise ValueError(
                 "You can only use one kind of guided decoding "
-                "('guided_json', 'guided_regex' or 'guided_choice').")
+                "('guided_json', 'guided_regex', 'guided_stencil' "
+                "or 'guided_choice').")
         return data
 
     @model_validator(mode="before")

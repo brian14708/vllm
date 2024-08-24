@@ -17,6 +17,7 @@ from vllm.model_executor.guided_decoding.guided_fields import (
 from vllm.model_executor.guided_decoding.outlines_decoding import (
     get_local_outlines_guided_decoding_logits_processor,
     get_outlines_guided_decoding_logits_processor)
+from vllm.model_executor.guided_decoding.stencil_parser import StencilParser
 from vllm.sampling_params import LogitsProcessor
 
 
@@ -45,6 +46,8 @@ async def get_lm_format_enforcer_guided_decoding_logits_processor(
         # CFG grammar not supported by LMFE, revert to outlines
         return await get_outlines_guided_decoding_logits_processor(
             request, tokenizer)
+    elif request.guided_stencil:
+        character_level_parser = StencilParser(request.guided_stencil)
     elif (request.response_format is not None
           and request.response_format.type == "json_object"):
         character_level_parser = JsonSchemaParser(
@@ -82,6 +85,8 @@ def get_local_lm_format_enforcer_guided_decoding_logits_processor(
         # CFG grammar not supported by LMFE, revert to outlines
         return get_local_outlines_guided_decoding_logits_processor(
             guided_options, tokenizer)
+    elif guided_options.guided_stencil:
+        character_level_parser = StencilParser(guided_options.guided_stencil)
     elif guided_options.guided_json_object:
         # None means any json object
         character_level_parser = JsonSchemaParser(None)
